@@ -1,15 +1,31 @@
-# What is this?
+name: Build and Test .NET Application
 
-The github.dev web-based editor is a lightweight editing experience that runs entirely in your browser. You can navigate files and source code repositories from GitHub, and make and commit code changes.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-There are two ways to go directly to a VS Code environment in your browser and start coding:
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-* Press the . key on any repository or pull request.
-* Swap `.com` with `.dev` in the URL. For example, this repo https://github.com/github/dev becomes http://github.dev/github/dev
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-Preview the gif below to get a quick demo of github.dev in action.
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x' # Specify the .NET version you are using
 
-![github dev](https://user-images.githubusercontent.com/856858/130119109-4769f2d7-9027-4bc4-a38c-10f297499e8f.gif)
+    - name: Restore dependencies
+      run: dotnet restore
 
-# Why?
-It’s a quick way to edit and navigate code. It's especially useful if you want to edit multiple files at a time or take advantage of all the powerful code editing features of Visual Studio Code when making a quick change. For more information, see our [documentation](https://github.co/codespaces-editor-help).
+    - name: Build the application
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal
